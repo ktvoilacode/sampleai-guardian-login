@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle, Mail, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 
 const Index = () => {
   const [email, setEmail] = useState("");
@@ -21,6 +22,15 @@ const Index = () => {
   const [resetEmail, setResetEmail] = useState("");
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [resetEmailError, setResetEmailError] = useState("");
+  
+  // New validation states
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [emailValid, setEmailValid] = useState(true);
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [hasMinLength, setHasMinLength] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [resetEmailTouched, setResetEmailTouched] = useState(false);
+  const [resetEmailValid, setResetEmailValid] = useState(true);
 
   const validateEmail = (email: string) => {
     if (!email) return false;
@@ -34,6 +44,28 @@ const Index = () => {
     // Check if domain is a common personal email provider
     const personalDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "aol.com", "icloud.com"];
     return !personalDomains.includes(domain);
+  };
+  
+  // Check password strength whenever it changes
+  useEffect(() => {
+    setHasMinLength(password.length >= 8);
+    
+    // Simple strength check for login (just based on length)
+    setPasswordStrength(password.length >= 8 ? 100 : (password.length / 8) * 100);
+  }, [password]);
+
+  const handleEmailBlur = () => {
+    setEmailTouched(true);
+    setEmailValid(validateEmail(email));
+  };
+
+  const handlePasswordBlur = () => {
+    setPasswordTouched(true);
+  };
+
+  const handleResetEmailBlur = () => {
+    setResetEmailTouched(true);
+    setResetEmailValid(validateEmail(resetEmail));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -84,6 +116,7 @@ const Index = () => {
     setResetEmail("");
     setResetEmailSent(false);
     setResetEmailError("");
+    setResetEmailTouched(false);
   };
 
   return (
@@ -131,9 +164,16 @@ const Index = () => {
                     placeholder="name@company.com" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onBlur={handleEmailBlur}
                     required
-                    className="border-gray-300"
+                    className={`border-gray-300 ${emailTouched && !emailValid ? 'border-2 border-red-500' : ''}`}
                   />
+                  {emailTouched && !emailValid && (
+                    <div className="text-red-500 text-sm flex items-center gap-1 mt-1">
+                      <AlertTriangle className="h-3 w-3" />
+                      <span>Only company email addresses are allowed</span>
+                    </div>
+                  )}
                   <p className="text-xs text-gray-500">Only company email addresses are allowed</p>
                 </div>
                 
@@ -148,6 +188,7 @@ const Index = () => {
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      onBlur={handlePasswordBlur}
                       required
                       className="border-gray-300 pr-10"
                     />
@@ -159,6 +200,19 @@ const Index = () => {
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
+                  
+                  {/* Simple password strength indicator */}
+                  {passwordTouched && password.length > 0 && (
+                    <div className="mt-2">
+                      <Progress 
+                        value={passwordStrength} 
+                        className="h-1" 
+                      />
+                      {!hasMinLength && (
+                        <p className="text-xs text-red-500 mt-1">Password must be at least 8 characters</p>
+                      )}
+                    </div>
+                  )}
                 </div>
                 
                 <div className="flex items-center space-x-2">
@@ -234,9 +288,16 @@ const Index = () => {
                   placeholder="name@company.com" 
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
+                  onBlur={handleResetEmailBlur}
                   required
-                  className="border-gray-300"
+                  className={`border-gray-300 ${resetEmailTouched && !resetEmailValid ? 'border-2 border-red-500' : ''}`}
                 />
+                {resetEmailTouched && !resetEmailValid && (
+                  <div className="text-red-500 text-sm flex items-center gap-1 mt-1">
+                    <AlertTriangle className="h-3 w-3" />
+                    <span>Only company email addresses are allowed</span>
+                  </div>
+                )}
               </div>
               
               <DialogFooter className="flex gap-2 justify-end">

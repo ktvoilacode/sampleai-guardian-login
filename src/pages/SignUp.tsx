@@ -1,14 +1,15 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle, Mail, Eye, EyeOff } from "lucide-react";
+import { AlertTriangle, Mail, Eye, EyeOff, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 
 const SignUp = () => {
   const [fullName, setFullName] = useState("");
@@ -20,6 +21,19 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  
+  // New validation states
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [emailValid, setEmailValid] = useState(true);
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
+  
+  // Password strength indicators
+  const [hasUpperCase, setHasUpperCase] = useState(false);
+  const [hasNumber, setHasNumber] = useState(false);
+  const [hasMinLength, setHasMinLength] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
 
   const validateEmail = (email: string) => {
     if (!email) return false;
@@ -33,6 +47,37 @@ const SignUp = () => {
     // Check if domain is a common personal email provider
     const personalDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "aol.com", "icloud.com"];
     return !personalDomains.includes(domain);
+  };
+
+  // Check password strength whenever password changes
+  useEffect(() => {
+    setHasUpperCase(/[A-Z]/.test(password));
+    setHasNumber(/\d/.test(password));
+    setHasMinLength(password.length >= 8);
+    
+    // Calculate strength percentage (0-100)
+    const strengthChecks = [/[A-Z]/.test(password), /\d/.test(password), password.length >= 8];
+    const passedChecks = strengthChecks.filter(Boolean).length;
+    setPasswordStrength((passedChecks / strengthChecks.length) * 100);
+    
+    // Check if passwords match whenever password changes
+    if (confirmPasswordTouched) {
+      setPasswordsMatch(password === confirmPassword);
+    }
+  }, [password, confirmPassword, confirmPasswordTouched]);
+
+  const handleEmailBlur = () => {
+    setEmailTouched(true);
+    setEmailValid(validateEmail(email));
+  };
+
+  const handlePasswordBlur = () => {
+    setPasswordTouched(true);
+  };
+
+  const handleConfirmPasswordBlur = () => {
+    setConfirmPasswordTouched(true);
+    setPasswordsMatch(password === confirmPassword);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -147,9 +192,16 @@ const SignUp = () => {
                     placeholder="name@company.com" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onBlur={handleEmailBlur}
                     required
-                    className="border-gray-300"
+                    className={`border-gray-300 ${emailTouched && !emailValid ? 'border-2 border-red-500' : ''}`}
                   />
+                  {emailTouched && !emailValid && (
+                    <div className="text-red-500 text-sm flex items-center gap-1 mt-1">
+                      <AlertTriangle className="h-3 w-3" />
+                      <span>Only company email addresses are allowed</span>
+                    </div>
+                  )}
                   <p className="text-xs text-gray-500">Only company email addresses are allowed</p>
                 </div>
                 
@@ -161,6 +213,7 @@ const SignUp = () => {
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      onBlur={handlePasswordBlur}
                       required
                       className="border-gray-300 pr-10"
                     />
@@ -172,7 +225,35 @@ const SignUp = () => {
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
-                  <p className="text-xs text-gray-500">Password must be at least 8 characters with numbers and letters</p>
+                  
+                  {/* Password strength indicators */}
+                  {passwordTouched && (
+                    <div className="mt-2 p-3 bg-gray-50 rounded-md border">
+                      <div className="mb-2">
+                        <Progress value={passwordStrength} className="h-2" />
+                      </div>
+                      <ul className="space-y-1 text-sm">
+                        <li className="flex items-center gap-2">
+                          <div className={`w-4 h-4 rounded-full flex items-center justify-center ${hasUpperCase ? 'bg-green-500' : 'bg-red-500'}`}>
+                            {hasUpperCase && <Check className="h-3 w-3 text-white" />}
+                          </div>
+                          <span>At least one uppercase letter</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className={`w-4 h-4 rounded-full flex items-center justify-center ${hasNumber ? 'bg-green-500' : 'bg-red-500'}`}>
+                            {hasNumber && <Check className="h-3 w-3 text-white" />}
+                          </div>
+                          <span>At least one number</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className={`w-4 h-4 rounded-full flex items-center justify-center ${hasMinLength ? 'bg-green-500' : 'bg-red-500'}`}>
+                            {hasMinLength && <Check className="h-3 w-3 text-white" />}
+                          </div>
+                          <span>At least 8 characters</span>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="space-y-2">
@@ -183,8 +264,9 @@ const SignUp = () => {
                       type={showConfirmPassword ? "text" : "password"}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
+                      onBlur={handleConfirmPasswordBlur}
                       required
-                      className="border-gray-300 pr-10"
+                      className={`border-gray-300 pr-10 ${confirmPasswordTouched && !passwordsMatch ? 'border-2 border-red-500' : ''}`}
                     />
                     <button
                       type="button"
@@ -194,6 +276,12 @@ const SignUp = () => {
                       {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
+                  {confirmPasswordTouched && !passwordsMatch && (
+                    <div className="text-red-500 text-sm flex items-center gap-1 mt-1">
+                      <AlertTriangle className="h-3 w-3" />
+                      <span>Passwords do not match</span>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="flex items-center space-x-2">
