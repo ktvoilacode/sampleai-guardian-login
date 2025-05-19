@@ -139,7 +139,7 @@ const SignUp = () => {
       {/* Left side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-blue-600 items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-6">Welcome to TruxtedAI</h1>
+          <h1 className="text-4xl font-bold text-white mb-6">Welcome to AI Platfrom</h1>
           <p className="text-xl text-white/80">Intelligent solutions for your business</p>
         </div>
       </div>
@@ -152,13 +152,13 @@ const SignUp = () => {
               <div className="bg-blue-600 rounded-md p-2">
                 <Mail className="h-6 w-6 text-white" />
               </div>
-              <span className="text-2xl font-bold text-gray-800">TruxtedAI</span>
+              <span className="text-2xl font-bold text-gray-800">AI Platfrom</span>
             </div>
           </div>
           
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold text-gray-800">Create an Account</h2>
-            <p className="text-gray-600 mt-2">Join TruxtedAI to access intelligent business solutions</p>
+            <p className="text-gray-600 mt-2">Join AI Platfrom to access intelligent business solutions</p>
           </div>
           
           <Card className="border shadow-md bg-white">
@@ -319,7 +319,7 @@ const SignUp = () => {
           <DialogHeader>
             <DialogTitle>Registration Successful!</DialogTitle>
             <DialogDescription>
-              Thank you for registering with TruxtedAI. Your account has been created successfully.
+              Thank you for registering with AI Platfrom. Your account has been created successfully.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end">

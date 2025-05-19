@@ -11,6 +11,33 @@ import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 
+/*************  ✨ Windsurf Command ⭐  *************/
+/**
+ * Index component represents the main login page for the AI Platfrom application.
+ * It includes form inputs for email and password, with validation for company email addresses.
+ * The component handles user interactions such as showing/hiding password visibility,
+ * validating input fields, and managing dialog states for login success and password reset.
+ * 
+ * State:
+ * - email, password: Stores user input for login credentials.
+ * - rememberMe: Boolean for "Remember me" checkbox state.
+ * - error: String for displaying error messages.
+ * - showPassword: Boolean to toggle password visibility.
+ * - successDialogOpen: Boolean to manage login success dialog visibility.
+ * - forgotPasswordDialogOpen: Boolean to manage forgot password dialog visibility.
+ * - resetEmail, resetEmailSent, resetEmailError: State for handling password reset functionality.
+ * - emailTouched, emailValid, passwordTouched, hasMinLength, passwordStrength, resetEmailTouched, resetEmailValid: Validation and UI feedback states.
+ * 
+ * Methods:
+ * - validateEmail: Validates email format and checks for non-personal domains.
+ * - handleEmailBlur, handlePasswordBlur, handleResetEmailBlur: Handlers for input blur events to update validation states.
+ * - handleSubmit: Form submission handler for login.
+ * - handleResetPassword: Form submission handler for password reset.
+ * - togglePasswordVisibility: Toggles password input visibility.
+ * - handleForgotPasswordClick, closeForgotPasswordDialog: Handlers for managing forgot password dialog state.
+ */
+
+/*******  69fdb01a-6e58-4a0c-8c35-8844c8c4ee76  *******/
 const Index = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -124,7 +151,7 @@ const Index = () => {
       {/* Left side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-blue-600 items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-6">Welcome to TruxtedAI</h1>
+          <h1 className="text-4xl font-bold text-white mb-6">Welcome to AI Platfrom</h1>
           <p className="text-xl text-white/80">Intelligent solutions for your business</p>
         </div>
       </div>
@@ -137,13 +164,13 @@ const Index = () => {
               <div className="bg-blue-600 rounded-md p-2">
                 <Mail className="h-6 w-6 text-white" />
               </div>
-              <span className="text-2xl font-bold text-gray-800">TruxtedAI</span>
+              <span className="text-2xl font-bold text-gray-800">AI Platfrom</span>
             </div>
           </div>
           
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold text-gray-800">Sign In</h2>
-            <p className="text-gray-600 mt-2">Please sign in to continue to TruxtedAI</p>
+            <p className="text-gray-600 mt-2">Please sign in to continue to AI Platfrom</p>
           </div>
           
           <Card className="border shadow-md bg-white">
@@ -250,7 +277,7 @@ const Index = () => {
           <DialogHeader>
             <DialogTitle>Login Successful!</DialogTitle>
             <DialogDescription>
-              You have successfully logged in to your TruxtedAI account.
+              You have successfully logged in to your AI Platfrom account.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end">
