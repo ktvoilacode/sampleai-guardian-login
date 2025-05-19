@@ -2,17 +2,16 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { AlertCircle, ArrowRight } from "lucide-react";
+import { AlertCircle, ArrowRight, CheckCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Header from "@/components/Header";
 
 const Sandbox = () => {
-  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [website, setWebsite] = useState("");
   const [fullName, setFullName] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [step, setStep] = useState(1);
 
   const validateEmail = (email: string) => {
@@ -39,11 +38,10 @@ const Sandbox = () => {
   const handleEmailBlur = () => {
     const error = validateEmail(email);
     setEmailError(error);
+    setSuccessMessage("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSendCode = () => {
     const error = validateEmail(email);
     setEmailError(error);
     
@@ -52,22 +50,24 @@ const Sandbox = () => {
     }
 
     // Check for test emails
-    if (email === "sample@example.com" || email === "new@example.com") {
-      toast({
-        title: "Success",
-        description: "Code sent successfully. You can enter the code to try out sandbox.",
-        variant: "default",
-      });
+    if (email === "sample@example.com") {
+      setEmailError("Account already exists. Please login.");
+      setSuccessMessage("");
+    } else if (email === "new@example.com") {
+      setEmailError("");
+      setSuccessMessage("Code sent successfully. You can enter the code to try out sandbox.");
       setStep(2);
     } else {
       // For all other valid corporate emails
-      toast({
-        title: "Success",
-        description: "Code sent successfully to your email. Please check your inbox.",
-        variant: "default",
-      });
+      setEmailError("");
+      setSuccessMessage("Code sent successfully to your email. Please check your inbox.");
       setStep(2);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSendCode();
   };
 
   return (
@@ -75,7 +75,21 @@ const Sandbox = () => {
       <Header />
       
       <div className="p-6 max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-12">Try it for your content</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-6">Try it for your content</h1>
+        
+        {emailError && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{emailError}</AlertDescription>
+          </Alert>
+        )}
+        
+        {successMessage && (
+          <Alert className="mb-6 bg-green-50 border-green-200 text-green-800">
+            <CheckCircle className="h-4 w-4 text-green-500" />
+            <AlertDescription>{successMessage}</AlertDescription>
+          </Alert>
+        )}
         
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex-1">
@@ -105,34 +119,17 @@ const Sandbox = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     onBlur={handleEmailBlur}
-                    placeholder="hello@truxt.ai"
+                    placeholder="hello@example.com"
                     className={`w-full ${emailError ? "border-red-500" : ""}`}
                   />
                   <Button 
                     type="button" 
                     className="bg-blue-400 hover:bg-blue-500 text-white"
-                    onClick={() => {
-                      const error = validateEmail(email);
-                      if (!error) {
-                        toast({
-                          title: "Success",
-                          description: "Code sent successfully. Please check your email.",
-                          variant: "default",
-                        });
-                      } else {
-                        setEmailError(error);
-                      }
-                    }}
+                    onClick={handleSendCode}
                   >
                     Send Code
                   </Button>
                 </div>
-                {emailError && (
-                  <Alert variant="destructive" className="mt-2 py-2">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{emailError}</AlertDescription>
-                  </Alert>
-                )}
               </div>
 
               <div>
@@ -181,7 +178,7 @@ const Sandbox = () => {
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-medium">Get Instance instance ready</h3>
+                  <h3 className="font-medium">Get Instance ready</h3>
                   <p className="text-gray-500">Step 2</p>
                 </div>
               </div>
